@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Service Worker Registered');
         });
     }
+
+    
+    document.querySelectorAll('.story-list').forEach(list => {
+        list.addEventListener('dragover', allowDrop);
+        list.addEventListener('drop', drop);
+    });
+
 });
 
 function loadUserStories() {
@@ -19,12 +26,7 @@ function loadUserStories() {
     done.innerHTML = '';
 
     userStories.forEach(story => {
-        const li = document.createElement('li');
-        li.setAttribute('draggable', 'true');
-        li.setAttribute('data-id', story.id);
-        li.setAttribute('ondragstart', 'drag(event)');
-        li.innerHTML = `<strong>${story.title}</strong>`;
-
+        const li = createStoryElement(story);
         if (story.status === 'backlog') {
             backlog.appendChild(li);
         } else if (story.status === 'in-progress') {
@@ -33,6 +35,16 @@ function loadUserStories() {
             done.appendChild(li);
         }
     });
+}
+
+function createStoryElement(story) {
+    const li = document.createElement('li');
+    li.setAttribute('draggable', 'true');
+    li.setAttribute('data-id', story.id);
+    li.setAttribute('ondragstart', 'drag(event)');
+    li.setAttribute('ondragover', 'allowDrop(event)');
+    li.innerHTML = `<strong>${story.title}</strong>`;
+    return li;
 }
 
 function addUserStory() {
@@ -49,19 +61,41 @@ function addUserStory() {
 
 function allowDrop(event) {
     event.preventDefault();
+    event.stopPropagation(); // Ensure event doesn't propagate further
 }
 
 function drag(event) {
     event.dataTransfer.setData('text', event.target.getAttribute('data-id'));
+    console.log(event.target.getAttribute('data-id'));
 }
 
+/**
+ * Handles the drop event when an element is dropped onto a target element.
+ * @param {Event} event - The drop event object.
+ */
 function drop(event) {
     event.preventDefault();
+    event.stopPropagation(); // Ensure event doesn't propagate further
+
     const id = event.dataTransfer.getData('text');
-    const status = event.target.getAttribute('data-status');
-    if (status) {
-        KanbanService.updateUserStoryStatus(Number(id), status);
-        loadUserStories();
+    const target = event.target;
+    const status = target.getAttribute('data-status');
+    
+    if (status && target.classList.contains('story-list')) {
+        const stories = KanbanService.getUserStories(); // Fetch the list of stories
+
+        // Find the index of the updated story in the stories array
+        const updatedStoryIndex = stories.findIndex(story => story.id === Number(id));
+        
+        // If the story is found in the array
+        if (updatedStoryIndex !== -1) {
+            // Update the status of the story
+            stories[updatedStoryIndex].status = status;
+            
+            // Save the updated list of stories back to the database
+            KanbanService.saveUserStories(stories);
+            loadUserStories()
+        }
     }
 }
 

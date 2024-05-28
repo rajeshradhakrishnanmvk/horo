@@ -44,6 +44,7 @@ body {
 }
 
 .story-list {
+    min-height: 50px;
     list-style: none;
     padding: 0;
 }

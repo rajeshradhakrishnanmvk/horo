@@ -16,15 +16,15 @@
         <div class="board">
             <div class="column" id="backlog">
                 <h2>Backlog</h2>
-                <ul class="story-list" data-status="backlog"></ul>
+                <ul class="story-list" data-status="backlog" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
-            <div class="column" id="in-progress">
+            <div class="column" id="in-progress" >
                 <h2>In Progress</h2>
-                <ul class="story-list" data-status="in-progress"></ul>
+                <ul class="story-list" data-status="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
             <div class="column" id="done">
                 <h2>Done</h2>
-                <ul class="story-list" data-status="done"></ul>
+                <ul class="story-list" data-status="done" ondrop="drop(event)" ondragover="allowDrop(event)"></ul>
             </div>
         </div>
     </div>

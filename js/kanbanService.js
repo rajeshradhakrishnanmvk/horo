@@ -5,6 +5,7 @@ const KanbanService = {
     },
 
     saveUserStories: function(userStories) {
+        console.log(userStories);
         localStorage.setItem('userStories', JSON.stringify(userStories));
     },
 
